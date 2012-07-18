@@ -1,0 +1,25 @@
+#!/bin/bash
+# Simple IRC announcer made with expect and telnet
+# Usage: irc-msg <msg ...>
+MSG=$@
+[[ -z $MSG ]] && MSG="Hello World"
+
+# CHANGE THE STUFF
+NICK=irc-msg
+CHANNEL=#freenode		   
+CHANNEL_PASS=""
+SERVER=irc.freenode.net
+PORT=6667
+
+# DONT CHANGE THIS STUFF
+expect -c "
+ spawn telnet $SERVER $PORT
+  expect \"No Ident response\"
+   send \"USER $NICK $NICK $NICK $NICK\rNICK $NICK\r\"
+  expect \" :+i\"
+   send \"JOIN $CHANNEL$CHANNEL_PASS\r\"
+  expect \"JOIN $CHANNEL\"
+   send \"PRIVMSG $CHANNEL :$MSG\rQUIT bye\r\"
+  expect \"BLAH BLAH\"
+   send \"BLAH\"
+"
