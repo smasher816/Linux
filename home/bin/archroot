@@ -1,0 +1,49 @@
+#!/bin/bash
+# Simple chroot manager
+# Usage: archroot {start|stop|restart|shell|ANY-SHELL-CMD}
+
+if [ $UID -ne "0" ]; then
+	echo "Must be ran as root"
+	exit 1
+fi
+
+# Change these CH_ variables to match your config
+CH_DIR=/opt/archroot
+CH_USER=andy
+CH_SHELL=/bin/bash
+
+dirs=(/dev /dev/shm /var/run)
+case $1 in
+	start)
+		echo "Starting Archroot"
+		for d in "${dirs[@]}"; do
+			mount -o bind $d $CH_DIR$d
+		done
+		mount -t proc none $CH_DIR/proc
+		mount -t sysfs none $CH_DIR/sys
+		mount -t devpts pts $CH_DIR/dev/pts
+		mount -t tmpfs none $CH_DIR/tmp
+		echo "Done!"
+		;;
+	stop)
+		echo "Stopping Archroot"
+		for (( i = ${#dirs[@]} - 1; i >= 0; i-- )); do
+			if [ "${dirs[i]}" != "/dev" ]; then
+				umount "$CH_DIR${dirs[i]}"
+			fi
+        	done
+		umount $CH_DIR/{proc,sys,tmp}
+		echo "Done!"
+		;;
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+		;;
+	shell)
+		chroot $CH_DIR $CH_SHELL -c "su $CH_USER"
+		;;
+	*)
+		schroot -p -- $@
+esac
+exit 0
