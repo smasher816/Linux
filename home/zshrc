@@ -1,1 +1,149 @@
-/home/rowand/.zshrc
+# Options #
+###########
+setopt autocd
+setopt extendedglob
+setopt promptsubst
+
+# Fix Keybindings #
+###################
+typeset -g -A key
+bindkey '^?' backward-delete-char
+bindkey '^[[7~' beginning-of-line
+bindkey '^[[5~' up-line-or-history
+bindkey '^[[3~' delete-char
+bindkey '^[[8~' end-of-line
+bindkey '^[[6~' down-line-or-history
+bindkey '^[[A' up-line-or-search
+bindkey '^[[D' backward-char
+bindkey '^[[B' down-line-or-search
+bindkey '^[[C' forward-char 
+bindkey '^[[2~' overwrite-mode
+bindkey -e
+
+# Completion and History #
+##########################
+autoload -Uz compinit
+compinit
+
+setopt extended_history
+setopt hist_allow_clobber
+setopt hist_ignore_dups
+setopt hist_ignore_space
+HISTFILE=~/.histfile
+HISTSIZE=1000000
+SAVEHIST=1000000
+
+# Prompt #
+##########
+
+PROMPT="$(echo -e \\a)%B%K{black}" 		# Bold on black, alarm at prompt (when last command finished)
+RPROMPT='%B%F{blue}%K{black}%~%b%f%k' # Current directory on right
+
+## Special UID changes
+if [ $UID -eq "0" ]; then
+ PROMPT+="%F{red}" 		# Red prompt for root
+elif [ -n "$SSH_CLIENT" ]; then
+ PROMPT+="%F{yellow}" 	# Yellow prompt for ssh
+ PROMPT+="%n@%M" 		# Tell ssh users who they are
+else
+ PROMPT+="%F{blue}"		# Blue prompt for normal
+fi
+PROMPT+="%#%f" #Add term symbol (%/#), and remove color. Keep bold+background
+
+#clear special coloring before command output
+preexec() {
+    tput sgr0
+}
+
+# Alias' #
+##########
+
+## File Extensions (add more)
+alias -s doc=libreoffice --writter
+alias -s odt=libreoffice --writter
+
+## Programs
+alias chromium='chromium --enable-seccomp-sandbox'
+
+## Admin stuff
+alias root='sudo su'
+alias shutdown='sudo systemctl poweroff -f -q --no-wall'
+alias hotboot='sudo systemctl kexec'
+alias restart='sudo systemctl reboot'
+alias halt='sudo systemctl halt'
+
+## ls helpers
+alias ls='ls --color=auto'
+alias ll='ls -la'
+alias l.='ls -d .*' 
+
+## Random stuff
+alias cp%="rsync --progress -ravz" # copy w/ %
+alias notify="echo -e '\a'"
+
+## Networking
+alias ip='ifconfig eth0 | grep -Po "inet .*? " | cut -d" " -f2'
+alias mac='ifconfig eth0 | grep -Po "ether .*? " | cut -d" " -f2'
+alias extip="curl http://ifconfig.me"
+
+alias pacman='sudo pacman'
+alias packer='packer-color'
+alias pacS='packer-color -S'
+alias pacR='sudo pacman -Rsn'
+
+# Functions #
+#############
+
+## System
+
+# Systemctl helper
+# Usage: systemctl {start|stop|restart|enable|disable|status} <service> [type]
+sys() {
+  sudo systemctl $1 $2.${3:-service}
+}
+
+## Misc
+
+# Run a command and notify of its response
+# Usage: urgent <cmd ...>
+alert() {
+	eval $@
+	if [[ $? == 0 ]]; then
+		notify-send -h string:fgcolor:#00ff00 -u critical "\"$1\"" "Executed Successfully :)"
+	else
+		notify-send -u critical -h string:fgcolor:#ff0000 "\"$1\"" "Failed :("
+	fi
+}
+
+alert2() {
+	eval $@
+	if [[ $? == 1 ]]; then
+		notify-send -u critical "\"$1\"" "Executed Successfully :)"
+	else
+		notify-send -u critical "\"$1\"" "Failed :("
+	fi
+}
+
+# Take a file and output it without comments or blank lines
+# Usage: nocomment <file> [comment-char]
+nocomment() {
+  grep -Ev "^s*(${2:-#}|$)" $1 | less
+}
+
+## Android
+
+# fix reboot recovery for SGS devices
+adb_recovery() {
+  adb shell "echo 1 > /data/.startrecovery"
+  adb shell sync
+  adb reboot recovery
+}
+
+# Install file from sdcard with OpenRecovery script 
+adb_flash() {
+  adb shell "echo \"install /emmc/$1\" > /cache/recovery/openrecoveryscript"
+  adb_recovery
+}
+
+source ~/.zshrc-private # Sorry github, have to hide some personal info
+cd ~ 					# For some strange reason terminals start in '/', fix that
