@@ -1,0 +1,231 @@
+############################################################################
+# i3 config file (v4)                                                      #
+# Please see http://i3wm.org/docs/userguide.html for a complete reference! #
+############################################################################
+
+# color                  border  backgr. text    indicator
+client.focused          #4c7899 #285577 #ffffff #2e9ef4
+client.focused_inactive #333333 #5f676a #ffffff #484e50
+client.unfocused        #333333 #222222 #888888 #292d2e
+client.urgent           #2f343a #900000 #ffffff #900000
+
+# window title font. ISO 10646 = Unicode
+font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+
+# window borders: none, 1pixel, normal
+new_window 1pixel
+
+# windows Key (Mod4) as the main modifier
+set $mod Mod4
+
+# mouse+$mod to move floating windows
+floating_modifier $mod
+
+# must use programs
+bindsym $mod+Return exec urxvt -e /bin/zsh
+bindsym $mod+backslash exec chromium --enable-seccomp-sandbox
+bindsym $mod+slash exec gnome-terminal
+
+# kill focused window
+bindsym $mod+Shift+Q kill
+
+# start dmenu (a program launcher)
+bindsym $mod+d exec dmenu_run
+
+# change focus
+bindsym $mod+j focus left
+bindsym $mod+k focus down
+bindsym $mod+l focus up
+bindsym $mod+semicolon focus right
+
+# change focus (arrow keys)
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move focused window
+bindsym $mod+Shift+J move left
+bindsym $mod+Shift+K move down
+bindsym $mod+Shift+L move up
+bindsym $mod+Shift+colon move right
+
+# move focused window (arrow keys)
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# split container {horizontal,vertical}ly
+bindsym $mod+h split h
+bindsym $mod+v split v
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen
+bindsym $mod+Shift+F fullscreen global
+
+# change container layout (stacked, tabbed, default)
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout default
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# toggle focus between tiling / floating
+bindsym $mod+space focus mode_toggle
+
+# focus the parent / child
+bindsym $mod+a focus parent
+#bindsym $mod+d focus child #duplicate, FIXME
+
+# workspace screen output
+workspace 1 output DFP4
+workspace 2 output DFP1
+workspace 3 output DFP3
+workspace 4 output DFP3
+workspace 10 output DFP3
+
+# workspace focus
+workspace_auto_back_and_forth yes
+bindsym $mod+grave scratchpad show
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+bindsym $mod+minus workspace prev
+bindsym $mod+equal workspace next
+bindsym $mod+Tab workspace back_and_forth
+bindsym $mod+BackSpace [con_mark="i3marker"] focus
+
+# workspace movement
+bindsym $mod+Shift+grave move scratchpad
+bindsym $mod+Shift+exclam move container to workspace 1
+bindsym $mod+Shift+at move container to workspace 2
+bindsym $mod+Shift+numbersign move container to workspace 3
+bindsym $mod+Shift+dollar move container to workspace 4
+bindsym $mod+Shift+percent move container to workspace 5
+bindsym $mod+Shift+asciicircum move container to workspace 6
+bindsym $mod+Shift+ampersand move container to workspace 7
+bindsym $mod+Shift+asterisk move container to workspace 8
+bindsym $mod+Shift+parenleft move container to workspace 9
+bindsym $mod+Shift+parenright move container to workspace 10
+bindsym $mod+Shift+underscore move container to workspace prev
+bindsym $mod+Shift+plus move container to workspace next
+bindsym $mod+Shift+BackSpace mark i3marker
+
+# reload / reload / exit
+#Cbindsym $mod+Shift+C reload # This breaks stuff for me, not sure why
+bindsym $mod+Shift+R restart
+bindsym $mod+Shift+E exit
+
+# power control
+bindsym $mod+Pause exec i3lock -d -c 000000
+bindsym Control+Mod1+Pause exec sudo systemctl poweroff
+bindsym Shift+control+Mod1+Pause exec sudo systemctl halt
+bindsym Control+Mod1+Delete exec sudo systemctl reboot
+bindsym Shift+control+Mod1+Delete exec sudo kexec -l /boot/vmlinuz-linux-$(uname -r | cut -d '-' -f3) --reuse-cmdline && sudo systemctl kexec
+bindsym Control+Mod1+BackSpace sudo systemctl rescue
+bindsym Shift+Control+Mod1+BackSpace sudo systemctl emergency
+
+# media keys
+bindsym XF86AudioRaiseVolume exec amixer -c 0 set Master 10dB+
+bindsym XF86AudioLowerVolume exec amixer -c 0 set Master 10dB-
+bindsym XF86AudioMute exec amixer -c 0 set Master toggle
+
+# pianobar <3
+assign [title="pianobar"] 10
+for_window [title="pianobar"] mark pianobar
+bindsym $mod+XF86AudioNext exec echo n > /home/rowand/.config/pianobar/ctl
+bindsym $mod+XF86AudioPrev exec echo h > /home/rowand/.config/pianobar/ctl
+bindsym $mod+XF86AudioStop exec killall pianobar
+bindsym $mod+XF86AudioRaiseVolume exec echo ')' > /home/rowand/.config/pianobar/ctl
+bindsym $mod+XF86AudioLowerVolume exec echo '(' > /home/rowand/.config/pianobar/ctl
+bindsym $mod+XF86AudioPlay exec echo p > /home/rowand/.config/pianobar/ctl
+bindsym $mod+Shift+XF86AudioNext exec echo u > /home/rowand/.config/pianobar/ctl
+bindsym $mod+Shift+XF86AudioPrev [con_mark="pianobar"] focus
+bindsym $mod+Shift+XF86AudioStop exec gnome-terminal -t pianobar -e pianobar
+bindsym $mod+Shift+XF86AudioRaiseVolume exec echo + > /home/rowand/.config/pianobar/ctl
+bindsym $mod+Shift+XF86AudioLowerVolume exec echo - > /home/rowand/.config/pianobar/ctl
+bindsym $mod+Shift+XF86AudioPlay exec echo t > /home/rowand/.config/pianobar/ctl
+
+# resize window mode bindings
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # grow / shrink, horizontal / vertical, with j/k/l/;
+        bindsym j resize shrink width 10 px or 10 ppt
+        bindsym k resize grow height 10 px or 10 ppt
+        bindsym l resize shrink height 10 px or 10 ppt
+        bindsym semicolon resize grow width 10 px or 10 ppt
+
+        # resize (arrow keys)
+        bindsym 113 resize shrink width 10 px or 10 ppt
+        bindsym 116 resize grow height 10 px or 10 ppt
+        bindsym 111 resize shrink height 10 px or 10 ppt
+        bindsym 114 resize grow width 10 px or 10 ppt
+
+        # normal mode: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# i3bar, display workspaces and system information (i3status)
+# screen 1 top bar
+bar {
+    position top
+	output DFP4
+	tray_output DFP3
+}
+
+# screen 2 top bar
+bar {
+    position top
+	output DFP1
+	tray_output DFP3
+}
+# screen 3 top bar (tray and system info)
+bar {
+    position top
+	output DFP3
+	tray_output DFP3
+	status_command i3status
+	colors {
+	      background #000000
+          statusline #ffffff
+          focused_workspace  #4c7899 #285577 #ffffff
+          active_workspace   #333333 #5f676a #ffffff
+          inactive_workspace #333333 #222222 #888888
+          urgent_workspace   #2f343a #900000 #ffffff
+	}
+}
+
+# startup programs
+##################
+
+# notifications would be nice
+exec --no-startup-id dunst
+
+# Arch wallpaper, thanks internet+gimp
+exec --no-startup-id feh --bg-scale ~/.i3/archlinux.png
+
+# redshift, save your eyes at 3AM
+exec --no-startup-id gtk-redshift
+
+# scratchpad a zsh urxvt terminal
+exec --no-startup-id urxvt -name scratchpad -e /bin/zsh
+for_window [instance="scratchpad"] move scratchpad
+
+# got to have my music (modded to start paused)
+exec --no-startup-id gnome-terminal -t pianobar -e pianobar
+
+# xchat
+exec --no-startup-id xchat
+assign [class="Xchat"] 4
